@@ -1,12 +1,14 @@
 package edu.kvcc.cis298.criminalintent;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,6 +29,8 @@ public class CrimeListFragment extends Fragment {
 
     //String key for saving whether to show the subtitle or not
     private static String SAVED_SUBTITLE_VISIBLE = "subtitle";
+
+    private static final String TAG = "CrimeListFragment";
 
     private RecyclerView mCrimeRecyclerView;
     //Declare a new crimeAdapter. This comes from the inner class
@@ -45,6 +50,7 @@ public class CrimeListFragment extends Fragment {
         //onCreateOptionsMenu method, which does the work of
         //inflating the menu and displaying it.
         setHasOptionsMenu(true);
+        new FetchItemsTask().execute();
     }
 
     @Nullable
@@ -271,7 +277,7 @@ public class CrimeListFragment extends Fragment {
         //the subtitle format. The format may be incorrect depending on the
         //version of android you are developing on??? We have the format
         //set as a string denoted by %1$s, however it might need to be
-        //%1$d. S is for string, d is for double? diget? It's for numbers!
+        //%1$d. S is for string, d is for double? digit? It's for numbers!
         String subtitle = getString(R.string.subtitle_format, crimeCount);
 
         //If we are hiding the subtitle, set the subtitle to null.
@@ -283,5 +289,19 @@ public class CrimeListFragment extends Fragment {
         //of the action bar, which is also called the tool bar.
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.getSupportActionBar().setSubtitle(subtitle);
+    }
+
+    private class FetchItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void...params) {
+            new CrimeFetcher().fetchCrimes();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid){
+            super.onPostExecute(aVoid);
+        }
     }
 }
